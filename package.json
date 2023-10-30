@@ -13,7 +13,6 @@
     "release": "standard-version"
   },
   "keywords": [
-    "template",
     "node",
     "typescript"
   ],
