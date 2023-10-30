@@ -1,7 +1,7 @@
 {
-  "name": "template",
+  "name": "gym-back-end",
   "version": "0.0.0",
-  "description": "Project responsible to create a template.",
+  "description": "Our monorepo codebase.",
   "main": "src/index.ts",
   "scripts": {
     "build": "tsc",
