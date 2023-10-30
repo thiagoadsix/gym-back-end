@@ -1,7 +1,11 @@
+import config from "config";
 import { DeepPartial } from "typeorm";
 
 import { User } from "../entities/user.entity";
-import { AppDataSource } from "../utils/data-source";
+
+import { AppDataSource } from "../../utils/data-source";
+import { signJwt } from "../../utils/jwt";
+import redisClient from "../../utils/redis-client";
 
 const userRepository = AppDataSource.getRepository(User);
 
@@ -19,4 +23,20 @@ export const findUserById = async (userId: string) => {
 
 export const findUser = async (query: Object) => {
   return await userRepository.findOneBy(query);
+};
+
+export const signTokens = async (user: User) => {
+  redisClient.set(user.id, JSON.stringify(user), {
+    EX: config.get<number>("redisCacheExpiresIn") * 60,
+  });
+
+  const access_token = signJwt({ sub: user.id }, "accessTokenPrivateKey", {
+    expiresIn: `${config.get<number>("accessTokenExpiresIn")}m`,
+  });
+
+  const refresh_token = signJwt({ sub: user.id }, "refreshTokenPrivateKey", {
+    expiresIn: `${config.get<number>("refreshTokenExpiresIn")}m`,
+  });
+
+  return { access_token, refresh_token };
 };
