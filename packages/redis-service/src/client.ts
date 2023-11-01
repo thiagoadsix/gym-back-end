@@ -2,7 +2,7 @@ import { createClient } from "redis";
 
 const redisUrl = "redis://localhost:6379";
 
-const redisClient = createClient({
+export const redisClient = createClient({
   url: redisUrl,
 });
 
@@ -18,5 +18,3 @@ const connectRedis = async () => {
 };
 
 connectRedis();
-
-export default redisClient;

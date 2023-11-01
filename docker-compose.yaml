@@ -7,7 +7,7 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - ./postgre:/var/lib/postgresql/data
+      - ./postgre-local:/var/lib/postgresql/data
     env_file:
       - ./.env
 
@@ -17,4 +17,4 @@ services:
     ports:
       - '6379:6379'
     volumes:
-      - ./redis:/data
+      - ./redis-local:/data

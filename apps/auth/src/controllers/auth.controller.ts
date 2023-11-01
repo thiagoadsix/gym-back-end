@@ -1,10 +1,9 @@
 import config from "config";
 import { CookieOptions, NextFunction, Request, Response } from "express";
 import { User } from "database";
-
-import AppError from "../../utils/app-error";
-import { signJwt, verifyJwt } from "../../utils/jwt";
-import redisClient from "../../utils/redis-client";
+import { signJwt, verifyJwt } from "authentication";
+import { redisClient } from "redis-service";
+import { AppError } from "errors";
 
 import {
   createUser,

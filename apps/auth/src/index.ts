@@ -4,10 +4,10 @@ import config from "config";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import { AppError } from "errors";
+import { redisClient } from "redis-service";
 
 import validateEnv from "../utils/validate-env";
-import redisClient from "../utils/redis-client";
-import AppError from "../utils/app-error";
 import { AppDataSource } from "../utils/data-source";
 
 import authRouter from "../src/routes/auth.route";

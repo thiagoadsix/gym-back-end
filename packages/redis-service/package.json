@@ -1,0 +1,14 @@
+{
+  "name": "redis-service",
+  "version": "0.0.0",
+  "main": "src/index.ts",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "redis": "^4.6.10",
+    "typescript": "^5.2.2"
+  },
+  "devDependencies": {
+    "@types/redis": "^4.0.11"
+  }
+}

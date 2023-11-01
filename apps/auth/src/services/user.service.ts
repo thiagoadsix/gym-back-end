@@ -1,11 +1,10 @@
 import config from "config";
 import { DeepPartial } from "typeorm";
-
+import { signJwt } from "authentication";
 import { User } from "database";
+import { redisClient } from "redis-service";
 
 import { AppDataSource } from "../../utils/data-source";
-import { signJwt } from "../../utils/jwt";
-import redisClient from "../../utils/redis-client";
 
 const userRepository = AppDataSource.getRepository(User);
 

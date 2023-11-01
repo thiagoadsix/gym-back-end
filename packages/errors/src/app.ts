@@ -1,4 +1,4 @@
-export default class AppError extends Error {
+export class AppError extends Error {
   status: string;
   isOperational: boolean;
   constructor(public statusCode: number = 500, public message: string) {

@@ -4,7 +4,7 @@ dist
 
 .env
 
-postgre
-redis
+postgre-local
+redis-local
 
 .turbo
