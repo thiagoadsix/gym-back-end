@@ -4,13 +4,12 @@
   "description": "Our monorepo codebase.",
   "private": true,
   "workspaces": [
-    "src/apps/*"
+    "apps/*",
+    "packages/*"
   ],
   "scripts": {
     "build": "turbo run build --no-daemon",
     "dev": "turbo run dev --parallel",
-    "start": "node dist/index.js",
-    "test": "jest",
     "prepare": "husky install",
     "commit": "git add . && git-cz",
     "release": "standard-version",
@@ -24,20 +23,13 @@
   "license": "ISC",
   "devDependencies": {
     "@commitlint/config-conventional": "^17.6.5",
-    "@types/jest": "^29.5.1",
-    "@types/node": "^20.2.1",
     "commitizen": "^4.3.0",
     "commitlint": "^17.6.5",
     "cz-conventional-changelog": "^3.3.0",
     "cz-customizable": "^7.0.0",
     "husky": "^8.0.3",
-    "jest": "^29.5.0",
-    "nodemon": "^2.0.22",
     "standard-version": "^9.5.0",
-    "ts-jest": "^29.1.0",
-    "ts-node": "^10.9.1",
-    "turbo": "^1.10.16",
-    "typescript": "^5.0.4"
+    "turbo": "^1.10.16"
   },
   "config": {
     "commitizen": {
@@ -46,5 +38,10 @@
   },
   "dependencies": {
     "dotenv": "^16.3.1"
-  }
+  },
+  "engines": {
+    "node": ">=20.9.0",
+    "yarn": "=1.19.0"
+  },
+  "packageManager": "yarn@1.19.0"
 }
