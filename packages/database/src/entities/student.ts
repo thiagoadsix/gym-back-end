@@ -1,4 +1,4 @@
-import { Entity, Column, OneToOne, JoinColumn } from "typeorm";
+import { Entity, Column, JoinColumn, ManyToOne } from "typeorm";
 
 import Base from "./base";
 import { User } from "./user";
@@ -29,7 +29,7 @@ export class Student extends Base {
   @Column()
   age!: number;
 
-  @OneToOne(() => User, (user) => user.students)
+  @ManyToOne(() => User, (user) => user.students)
   @JoinColumn({ name: "user_id" })
   user!: User;
 

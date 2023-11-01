@@ -23,5 +23,5 @@ export const findAllStudentByUserId = async (userId: string) => {
 };
 
 export const deleteStudentById = async (id: string) => {
-  return await studentRepository.delete({ id });
+  return await studentRepository.softDelete({ id });
 };

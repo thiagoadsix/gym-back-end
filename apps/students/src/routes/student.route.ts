@@ -2,7 +2,7 @@ import express from "express";
 import {
   createStudentHandler,
   getStudentHandler,
-  getAllStudentHandler,
+  getAllStudentByUserHandler,
   deleteStudentHandler,
 } from "../controllers/student.controller";
 
@@ -18,7 +18,7 @@ const router = express.Router();
 
 router.post("/", validate(createStudentSchema), createStudentHandler);
 router.get("/:id", validate(getStudentSchema), getStudentHandler);
-router.get("/", getAllStudentHandler);
+router.get("/:userId/user", getAllStudentByUserHandler);
 router.delete("/:id", validate(deleteStudentSchema), deleteStudentHandler);
 
 export default router;

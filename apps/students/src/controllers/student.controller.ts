@@ -54,7 +54,7 @@ export const getStudentHandler = async (
   }
 };
 
-export const getAllStudentHandler = async (
+export const getAllStudentByUserHandler = async (
   req: Request<GetAllStudentByIdInput>,
   res: Response,
   next: NextFunction
