@@ -96,9 +96,14 @@ export const loginUserHandler = async (
       httpOnly: false,
     });
 
+    const { password: hashedPassword, ...restUser } = user;
+
     res.status(200).json({
       status: "success",
-      access_token,
+      user: {
+        ...restUser,
+        access_token,
+      },
     });
   } catch (err: any) {
     next(err);

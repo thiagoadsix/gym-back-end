@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { Entity, Column, Index, BeforeInsert, OneToMany } from "typeorm";
 
-import Base from "./base";
+import { Base } from "./base";
 import { Student } from "./student";
 
 export enum RoleEnumType {

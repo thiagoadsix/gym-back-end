@@ -1,4 +1,4 @@
-import { number, object, string, TypeOf, date } from "zod";
+import { number, object, string, TypeOf } from "zod";
 
 export const createStudentSchema = object({
   body: object({
@@ -8,11 +8,10 @@ export const createStudentSchema = object({
     surname: string(),
     weight: number({ required_error: "Weight is required" }),
     height: number({ required_error: "Height is required" }),
-    sex: string({ required_error: "Sex is required" }),
     birthDate: string({ required_error: "Birth Date is required" }),
-    age: number({ required_error: "Age is required" }),
     city: string({ required_error: "City is required" }),
     state: string({ required_error: "State is required" }),
+    gender: string({ required_error: "Gender is required" }),
     userId: string({ required_error: "User ID is required" }),
   }),
 });
