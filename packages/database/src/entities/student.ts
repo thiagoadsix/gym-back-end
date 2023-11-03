@@ -1,7 +1,13 @@
-import { Entity, Column, JoinColumn, ManyToOne } from "typeorm";
+import { Entity, Column, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 
 import { Base } from "./base";
 import { User } from "./user";
+import { Assessment } from "./assessment";
+
+export enum GenderType {
+  MALE = "MALE",
+  FEMALE = "FEMALE",
+}
 
 @Entity("students")
 export class Student extends Base {
@@ -29,8 +35,12 @@ export class Student extends Base {
   @Column()
   age!: number;
 
-  @Column()
-  gender!: string;
+  @Column({
+    type: "enum",
+    enum: GenderType,
+    enumName: "gender_type",
+  })
+  gender!: GenderType;
 
   @ManyToOne(() => User, (user) => user.students)
   @JoinColumn({ name: "user_id" })
@@ -38,6 +48,9 @@ export class Student extends Base {
 
   @Column({ name: "user_id" })
   userId!: string;
+
+  @OneToMany(() => Student, (student) => student.user)
+  assessments!: Assessment[];
 
   toJSON() {
     return { ...this };

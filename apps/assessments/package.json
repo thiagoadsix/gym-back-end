@@ -1,0 +1,53 @@
+{
+  "name": "assessments",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/src/index.js",
+    "dev": "nodemon",
+    "typeorm": "typeorm-ts-node-commonjs",
+    "migrate": "node migrate.js",
+    "db:push": "rm -rf dist && yarn build && yarn typeorm migration:run -d utils/data-source.ts",
+    "db:down": "rm -rf dist && yarn build && yarn typeorm migration:revert -d utils/data-source.ts"
+  },
+  "keywords": [
+    "node",
+    "typescript",
+    "assessments"
+  ],
+  "author": "Thiago Andrade Silva",
+  "license": "ISC",
+  "dependencies": {
+    "@types/jsonwebtoken": "^9.0.4",
+    "bcryptjs": "^2.4.3",
+    "config": "^3.3.9",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "database": "*",
+    "date-fns": "^2.30.0",
+    "dotenv": "^16.3.1",
+    "envalid": "^8.0.0",
+    "errors": "*",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.11.3",
+    "redis-service": "*",
+    "reflect-metadata": "^0.1.13",
+    "typeorm": "^0.3.17",
+    "typescript": "^5.2.2",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.5",
+    "@types/config": "^3.3.2",
+    "@types/cookie-parser": "^1.4.5",
+    "@types/cors": "^2.8.15",
+    "@types/express": "^4.17.20",
+    "@types/morgan": "^1.9.7",
+    "@types/node": "^20.8.9",
+    "morgan": "^1.10.0",
+    "nodemon": "^3.0.1",
+    "ts-node": "^10.9.1"
+  }
+}

@@ -9,11 +9,12 @@
   ],
   "scripts": {
     "build": "turbo run build --no-daemon",
-    "dev": "turbo run dev --parallel",
+    "dev": "turbo run dev",
     "prepare": "husky install",
     "commit": "git add . && git-cz",
     "release": "standard-version",
-    "turbo": "turbo"
+    "turbo": "turbo",
+    "create-app": "node scripts/generate-app.js"
   },
   "keywords": [
     "node",

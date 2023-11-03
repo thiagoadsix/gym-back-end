@@ -1,5 +1,5 @@
 import { object, string, TypeOf, z } from "zod";
-import { RoleEnumType } from "database";
+import { RoleType } from "database";
 
 export const createUserSchema = object({
   body: object({
@@ -18,7 +18,7 @@ export const createUserSchema = object({
     passwordConfirm: string({
       required_error: "Please confirm your password",
     }),
-    role: z.optional(z.nativeEnum(RoleEnumType)),
+    role: z.optional(z.nativeEnum(RoleType)),
   }).refine((data) => data.password === data.passwordConfirm, {
     path: ["passwordConfirm"],
     message: "Passwords do not match",

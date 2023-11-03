@@ -1,17 +1,16 @@
-import { number, object, string, TypeOf } from "zod";
+import { GenderType } from "database";
+import { nativeEnum, number, object, string, TypeOf } from "zod";
 
 export const createStudentSchema = object({
   body: object({
-    name: string({
-      required_error: "Name is required",
-    }),
-    surname: string(),
+    name: string({ required_error: "Name is required" }),
+    surname: string({ required_error: "Surname is required" }),
     weight: number({ required_error: "Weight is required" }),
     height: number({ required_error: "Height is required" }),
     birthDate: string({ required_error: "Birth Date is required" }),
     city: string({ required_error: "City is required" }),
     state: string({ required_error: "State is required" }),
-    gender: string({ required_error: "Gender is required" }),
+    gender: nativeEnum(GenderType, { required_error: "Gender is required" }),
     userId: string({ required_error: "User ID is required" }),
   }),
 });

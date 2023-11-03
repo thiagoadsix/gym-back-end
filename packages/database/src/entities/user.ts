@@ -4,7 +4,7 @@ import { Entity, Column, Index, BeforeInsert, OneToMany } from "typeorm";
 import { Base } from "./base";
 import { Student } from "./student";
 
-export enum RoleEnumType {
+export enum RoleType {
   USER = "user",
   ADMIN = "admin",
 }
@@ -40,10 +40,11 @@ export class User extends Base {
 
   @Column({
     type: "enum",
-    enum: RoleEnumType,
-    default: RoleEnumType.USER,
+    enum: RoleType,
+    enumName: "role_type",
+    default: RoleType.USER,
   })
-  role!: RoleEnumType.USER;
+  role!: RoleType.USER;
 
   @Column({
     default: false,
