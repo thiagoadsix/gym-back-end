@@ -1,16 +1,27 @@
-import { Assessment, AssessmentType, GenderType, Student } from "database";
+import {
+  Assessment,
+  AssessmentType,
+  GenderType,
+  Student,
+  AssessmentsView,
+} from "database";
+
+import { AppDataSource } from "../../utils/data-source";
 
 import { FEMALE_COEFFICIENTS, MALE_COEFFICIENTS } from "../constants";
-import { CreateAssessmentPollock3Input } from "../schemas/assessment.schema";
-import { AppDataSource } from "../../utils/data-source";
+import {
+  CreateAssessmentPollock3Input,
+  GetAssessmentsByUserIdInput,
+} from "../schemas/assessment.schema";
 
 const assessmentRepository = AppDataSource.getRepository(Assessment);
 const studentRepository = AppDataSource.getRepository(Student);
+const assessmentView = AppDataSource;
 
 export const createAssessmentPollock3 = async (
   input: CreateAssessmentPollock3Input
 ) => {
-  const { chest, abdomen, thigh, tricep, suprailiac, studentId } = input;
+  const { chest, abdomen, thigh, triceps, suprailiac, studentId } = input;
   let sumOfSkinfolds: number;
   let bodyDensity: number;
 
@@ -28,7 +39,7 @@ export const createAssessmentPollock3 = async (
     bodyDensity =
       a + b * sumOfSkinfolds + c * Math.pow(sumOfSkinfolds, 2) + d * age;
   } else {
-    sumOfSkinfolds = tricep + suprailiac + thigh;
+    sumOfSkinfolds = triceps + suprailiac + thigh;
     const { a, b, c, d } = FEMALE_COEFFICIENTS;
     bodyDensity =
       a + b * sumOfSkinfolds + c * Math.pow(sumOfSkinfolds, 2) + d * age;
@@ -47,9 +58,22 @@ export const createAssessmentPollock3 = async (
         chest,
         abdomen,
         thigh,
-        tricep,
+        triceps,
         suprailiac,
       },
     })
   );
+};
+
+export const getAssessmentsByUserId = async (
+  input: GetAssessmentsByUserIdInput
+) => {
+  const { userId } = input;
+
+  const view = assessmentView
+    .createQueryBuilder(AssessmentsView, "assessmentsView")
+    .where("user_id = :userId", { userId })
+    .getMany();
+
+  return view;
 };
