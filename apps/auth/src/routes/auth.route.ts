@@ -17,8 +17,8 @@ import { createUserSchema, loginUserSchema } from "../schemas/user.schema";
 
 const router = express.Router();
 
-router.post("/register", validate(createUserSchema), registerUserHandler);
-router.post("/login", validate(loginUserSchema), loginUserHandler);
+router.post("/sign-up", validate(createUserSchema), registerUserHandler);
+router.post("/sign-in", validate(loginUserSchema), loginUserHandler);
 router.get(
   "/logout",
   deserializeUser(findUserById),
