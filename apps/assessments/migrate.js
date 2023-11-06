@@ -1,4 +1,3 @@
-
 const { exec } = require("child_process");
 
 const nameArg = process.argv[2];
@@ -11,7 +10,8 @@ const command = `rm -rf dist && yarn build && yarn typeorm migration:generate ./
 
 exec(command, (error, stdout, stderr) => {
   if (error) {
-    console.error(`Erro: ${error.message}`);
+    console.error(`Erro: ${error}`);
+    console.error(`Erro message: ${error.message}`);
     return;
   }
   if (stderr) {

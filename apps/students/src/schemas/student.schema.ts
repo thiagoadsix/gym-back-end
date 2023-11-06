@@ -5,7 +5,6 @@ export const createStudentSchema = object({
   body: object({
     name: string({ required_error: "Name is required" }),
     surname: string({ required_error: "Surname is required" }),
-    weight: number({ required_error: "Weight is required" }),
     height: number({ required_error: "Height is required" }),
     birthDate: string({ required_error: "Birth Date is required" }),
     city: string({ required_error: "City is required" }),

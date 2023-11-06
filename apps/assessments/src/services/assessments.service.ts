@@ -10,7 +10,7 @@ import { AppDataSource } from "../../utils/data-source";
 
 import { FEMALE_COEFFICIENTS, MALE_COEFFICIENTS } from "../constants";
 import {
-  CreateAssessmentPollock3Input,
+  CreateAssessmentInput,
   GetAssessmentsByUserIdInput,
 } from "../schemas/assessment.schema";
 
@@ -18,10 +18,60 @@ const assessmentRepository = AppDataSource.getRepository(Assessment);
 const studentRepository = AppDataSource.getRepository(Student);
 const assessmentView = AppDataSource;
 
-export const createAssessmentPollock3 = async (
-  input: CreateAssessmentPollock3Input
+export const createAssessment = async (input: CreateAssessmentInput) => {
+  const {
+    chest,
+    abdomen,
+    thigh,
+    triceps,
+    suprailiac,
+    weight,
+    assessmentType,
+    studentId,
+  } = input;
+
+  let assessment;
+
+  switch (assessmentType) {
+    case AssessmentType.POLLOCK_3:
+      assessment = await pollock3({
+        chest,
+        abdomen,
+        thigh,
+        triceps,
+        suprailiac,
+        weight,
+        studentId,
+      });
+      break;
+
+    default:
+      console.log("Assessment type does not match.");
+      return;
+  }
+
+  return assessmentRepository.save(
+    assessmentRepository.create({
+      studentId,
+      assessmentType,
+      assessmentData: {
+        ...assessment,
+        chest,
+        abdomen,
+        thigh,
+        triceps,
+        suprailiac,
+        weight,
+      },
+    })
+  );
+};
+
+const pollock3 = async (
+  input: Omit<CreateAssessmentInput, "assessmentType">
 ) => {
   const { chest, abdomen, thigh, triceps, suprailiac, studentId } = input;
+
   let sumOfSkinfolds: number;
   let bodyDensity: number;
 
@@ -47,22 +97,11 @@ export const createAssessmentPollock3 = async (
 
   const bodyFatPercentage = (4.95 / bodyDensity - 4.5) * 100;
 
-  return assessmentRepository.save(
-    assessmentRepository.create({
-      studentId,
-      assessmentType: AssessmentType.POLLOCK_3,
-      assessmentData: {
-        bodyDensity,
-        bodyFatPercentage,
-        sumOfSkinfolds,
-        chest,
-        abdomen,
-        thigh,
-        triceps,
-        suprailiac,
-      },
-    })
-  );
+  return {
+    bodyDensity: bodyDensity.toFixed(2),
+    bodyFatPercentage: bodyFatPercentage.toFixed(2),
+    sumOfSkinfolds,
+  };
 };
 
 export const getAssessmentsByUserId = async (
@@ -70,7 +109,7 @@ export const getAssessmentsByUserId = async (
 ) => {
   const { userId } = input;
 
-  const view = assessmentView
+  const view = await assessmentView
     .createQueryBuilder(AssessmentsView, "assessmentsView")
     .where("user_id = :userId", { userId })
     .getMany();

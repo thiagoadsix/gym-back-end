@@ -23,10 +23,7 @@ export class Student extends Base {
   @Column()
   state!: string;
 
-  @Column("double precision")
-  weight!: number;
-
-  @Column("double precision")
+  @Column("numeric", { precision: 5, scale: 2 })
   height!: number;
 
   @Column()

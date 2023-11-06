@@ -44,7 +44,7 @@ export class AssessmentsView extends BaseEntity {
   @Column({ name: "student_age" })
   studentAge!: number;
 
-  @Column({ name: "student_height" })
+  @Column("numeric", { precision: 5, scale: 2, name: "student_height" })
   studentHeight!: number;
 
   @Column({ name: "student_gender" })

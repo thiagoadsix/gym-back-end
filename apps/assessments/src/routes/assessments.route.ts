@@ -2,21 +2,17 @@ import express from "express";
 
 import { validate } from "../middlewares/validate";
 import {
-  createAssessmentPollock3Schema,
+  createAssessmentSchema,
   getAssessmentsByUserIdSchema,
 } from "../schemas/assessment.schema";
 import {
-  createAssessmentPollock3Handler,
+  createAssessmentHandler,
   getAssessmentsByUserIdHandler,
 } from "../controllers/assessments.controller";
 
 const router = express.Router();
 
-router.post(
-  "/pollock-three",
-  validate(createAssessmentPollock3Schema),
-  createAssessmentPollock3Handler
-);
+router.post("", validate(createAssessmentSchema), createAssessmentHandler);
 router.get(
   "/:userId/user",
   validate(getAssessmentsByUserIdSchema),

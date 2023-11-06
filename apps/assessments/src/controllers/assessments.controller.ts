@@ -1,24 +1,24 @@
 import { NextFunction, Request, Response } from "express";
 
 import {
-  createAssessmentPollock3,
+  createAssessment,
   getAssessmentsByUserId,
 } from "../services/assessments.service";
 
 import {
-  CreateAssessmentPollock3Input,
+  CreateAssessmentInput,
   GetAssessmentsByUserIdInput,
 } from "../schemas/assessment.schema";
 
-export const createAssessmentPollock3Handler = async (
-  req: Request<{}, {}, CreateAssessmentPollock3Input>,
+export const createAssessmentHandler = async (
+  req: Request<{}, {}, CreateAssessmentInput>,
   res: Response,
   next: NextFunction
 ) => {
   try {
     const body = req.body;
 
-    const assessment = await createAssessmentPollock3(body);
+    const assessment = await createAssessment(body);
 
     res.status(200).status(200).json({
       status: "success",

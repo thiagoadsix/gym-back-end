@@ -1,6 +1,7 @@
-import { number, object, string, TypeOf } from "zod";
+import { AssessmentType } from "database";
+import { nativeEnum, number, object, string, TypeOf } from "zod";
 
-export const createAssessmentPollock3Schema = object({
+export const createAssessmentSchema = object({
   body: object({
     chest: number({ required_error: "Chest is required" }),
     abdomen: number({ required_error: "Abdomen is required" }),
@@ -8,6 +9,10 @@ export const createAssessmentPollock3Schema = object({
     triceps: number({ required_error: "Tricep is required" }),
     suprailiac: number({ required_error: "Suprailiac Date is required" }),
     studentId: string({ required_error: "Student ID is required" }),
+    assessmentType: nativeEnum(AssessmentType, {
+      description: "Assessment Type is required",
+    }),
+    weight: number({ required_error: "Weight is required" }),
   }),
 });
 
@@ -17,8 +22,8 @@ export const getAssessmentsByUserIdSchema = object({
   }),
 });
 
-export type CreateAssessmentPollock3Input = TypeOf<
-  typeof createAssessmentPollock3Schema
+export type CreateAssessmentInput = TypeOf<
+  typeof createAssessmentSchema
 >["body"];
 export type GetAssessmentsByUserIdInput = TypeOf<
   typeof getAssessmentsByUserIdSchema
