@@ -11,7 +11,7 @@ import { AppDataSource } from "../../utils/data-source";
 import { FEMALE_COEFFICIENTS, MALE_COEFFICIENTS } from "../constants";
 import {
   CreateAssessmentInput,
-  GetAssessmentsByUserIdInput,
+  GetAssessmentsStudentByUserIdInput,
 } from "../schemas/assessment.schema";
 
 const assessmentRepository = AppDataSource.getRepository(Assessment);
@@ -28,6 +28,9 @@ export const createAssessment = async (input: CreateAssessmentInput) => {
     weight,
     assessmentType,
     studentId,
+    startDate,
+    endDate,
+    userId,
   } = input;
 
   let assessment;
@@ -52,6 +55,8 @@ export const createAssessment = async (input: CreateAssessmentInput) => {
 
   return assessmentRepository.save(
     assessmentRepository.create({
+      name: `${assessment?.studentName}-${startDate}-${endDate}`,
+      userId,
       studentId,
       assessmentType,
       assessmentData: {
@@ -63,12 +68,17 @@ export const createAssessment = async (input: CreateAssessmentInput) => {
         suprailiac,
         weight,
       },
+      startDate,
+      endDate,
     })
   );
 };
 
 const pollock3 = async (
-  input: Omit<CreateAssessmentInput, "assessmentType">
+  input: Omit<
+    CreateAssessmentInput,
+    "assessmentType" | "startDate" | "endDate" | "userId"
+  >
 ) => {
   const { chest, abdomen, thigh, triceps, suprailiac, studentId } = input;
 
@@ -101,11 +111,12 @@ const pollock3 = async (
     bodyDensity: bodyDensity.toFixed(2),
     bodyFatPercentage: bodyFatPercentage.toFixed(2),
     sumOfSkinfolds,
+    studentName: student.name,
   };
 };
 
-export const getAssessmentsByUserId = async (
-  input: GetAssessmentsByUserIdInput
+export const getAssessmentsStudentByUserId = async (
+  input: GetAssessmentsStudentByUserIdInput
 ) => {
   const { userId } = input;
 
@@ -115,4 +126,8 @@ export const getAssessmentsByUserId = async (
     .getMany();
 
   return view;
+};
+
+export const getAssessmentsByUserId = async (userId: string) => {
+  return await assessmentRepository.findBy({ userId });
 };

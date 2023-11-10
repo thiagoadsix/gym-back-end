@@ -1,6 +1,6 @@
 import { ViewEntity, BaseEntity, Column, DataSource } from "typeorm";
 
-import { AssessmentType } from "../entities/assessment";
+import { AssessmentStatus, AssessmentType } from "../entities/assessment";
 
 @ViewEntity({
   expression: (dataSource: DataSource) => {
@@ -15,7 +15,7 @@ import { AssessmentType } from "../entities/assessment";
         'student.age as "student_age"',
         'student.height as "student_height"',
         'student.gender as "student_gender"',
-        "json_agg(json_build_object('assessmentId', assessment.id, 'assessmentType', assessment.assessment_type, 'assessmentData', assessment.assessment_data, 'assessedAt', assessment.assessed_at)) as \"assessments\"",
+        "json_agg(json_build_object('assessmentId', assessment.id, 'assessmentType', assessment.assessment_type, 'assessmentData', assessment.assessment_data, 'startDate', assessment.start_date, 'endDate', assessment.endDate, 'status', assessment.status)) as \"assessments\"",
       ])
       .from("assessments", "assessment")
       .innerJoin("students", "student", "student.id = assessment.student_id")
@@ -55,6 +55,8 @@ export class AssessmentsView extends BaseEntity {
     assessmentId: string;
     assessmentType: AssessmentType;
     assessmentData: any;
-    assessedAt: Date;
+    startDate: string;
+    endDate: string;
+    status: AssessmentStatus;
   }>;
 }

@@ -3,6 +3,7 @@ import { Entity, Column, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import { Base } from "./base";
 import { User } from "./user";
 import { Assessment } from "./assessment";
+import { Workout } from "./workout";
 
 export enum GenderType {
   MALE = "MALE",
@@ -48,6 +49,9 @@ export class Student extends Base {
 
   @OneToMany(() => Student, (student) => student.user)
   assessments!: Assessment[];
+
+  @OneToMany(() => Workout, (workout) => workout.student)
+  workouts!: Workout[];
 
   toJSON() {
     return { ...this };

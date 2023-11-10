@@ -3,6 +3,7 @@ import { Entity, Column, Index, BeforeInsert, OneToMany } from "typeorm";
 
 import { Base } from "./base";
 import { Student } from "./student";
+import { Assessment } from "./assessment";
 
 export enum RoleType {
   USER = "user",
@@ -53,6 +54,9 @@ export class User extends Base {
 
   @OneToMany(() => Student, (student) => student.user)
   students!: Student[];
+
+  @OneToMany(() => Student, (student) => student.user)
+  assessments!: Assessment[];
 
   toJSON() {
     return { ...this, password: undefined, verified: undefined };

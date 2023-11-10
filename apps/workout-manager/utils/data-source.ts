@@ -7,8 +7,8 @@ import {
   Student,
   Assessment,
   AssessmentsView,
-  Exercise,
   Workout,
+  Exercise,
 } from "database";
 
 const postgresConfig = config.get<{
@@ -24,7 +24,7 @@ export const AppDataSource = new DataSource({
   type: "postgres",
   synchronize: false,
   logging: false,
-  entities: [User, Student, Assessment, AssessmentsView, Exercise, Workout],
+  entities: [User, Student, Assessment, AssessmentsView, Workout, Exercise],
   migrations: ["src/migrations/**/*{.ts,.js}"],
   subscribers: ["src/subscribers/**/*{.ts,.js}"],
 });
