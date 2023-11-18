@@ -5,13 +5,23 @@ import {
   Student,
   AssessmentsView,
 } from "database";
+import { AppError } from "errors";
 
 import { AppDataSource } from "../../utils/data-source";
 
-import { FEMALE_COEFFICIENTS, MALE_COEFFICIENTS } from "../constants";
+import {
+  FEMALE_3_COEFFICIENTS,
+  FEMALE_7_COEFFICIENTS,
+  MALE_3_COEFFICIENTS,
+  MALE_7_COEFFICIENTS,
+} from "../constants";
 import {
   CreateAssessmentInput,
   GetAssessmentsStudentByUserIdInput,
+  Pollock3FemaleSchema,
+  Pollock3MaleSchema,
+  Pollock7FemaleSchema,
+  Pollock7MaleSchema,
 } from "../schemas/assessment.schema";
 
 const assessmentRepository = AppDataSource.getRepository(Assessment);
@@ -19,39 +29,29 @@ const studentRepository = AppDataSource.getRepository(Student);
 const assessmentView = AppDataSource;
 
 export const createAssessment = async (input: CreateAssessmentInput) => {
-  const {
-    chest,
-    abdomen,
-    thigh,
-    triceps,
-    suprailiac,
-    weight,
-    assessmentType,
-    studentId,
-    startDate,
-    endDate,
-    userId,
-  } = input;
+  const { assessmentType, startDate, endDate, userId, data, studentId } = input;
 
   let assessment;
 
-  switch (assessmentType) {
-    case AssessmentType.POLLOCK_3:
-      assessment = await pollock3({
-        chest,
-        abdomen,
-        thigh,
-        triceps,
-        suprailiac,
-        weight,
-        studentId,
-      });
-      break;
-
-    default:
-      console.log("Assessment type does not match.");
-      return;
+  if (assessmentType === AssessmentType.POLLOCK_3) {
+    assessment = await pollock3(
+      { male: { ...input.data }, female: { ...input.data } },
+      studentId
+    );
+  } else if (assessmentType === AssessmentType.POLLOCK_7) {
+    assessment = await pollock7(
+      { male: { ...input.data }, female: { ...input.data } },
+      studentId
+    );
+  } else {
+    throw new AppError(401, "Invalid assessment type");
   }
+
+  const fatMass = calculateFatMass(
+    input.data.weight,
+    assessment.bodyFatPercentage
+  );
+  const leanMass = calculateLeanMass(input.data.weight, fatMass);
 
   return assessmentRepository.save(
     assessmentRepository.create({
@@ -60,13 +60,13 @@ export const createAssessment = async (input: CreateAssessmentInput) => {
       studentId,
       assessmentType,
       assessmentData: {
-        ...assessment,
-        chest,
-        abdomen,
-        thigh,
-        triceps,
-        suprailiac,
-        weight,
+        bodyDensity: assessment?.bodyDensity,
+        bodyFatPercentage: assessment?.bodyFatPercentage,
+        sumOfSkinfolds: assessment?.sumOfSkinfolds,
+        bmr: assessment.bmr,
+        fatMass,
+        leanMass,
+        ...data,
       },
       startDate,
       endDate,
@@ -75,15 +75,63 @@ export const createAssessment = async (input: CreateAssessmentInput) => {
 };
 
 const pollock3 = async (
-  input: Omit<
-    CreateAssessmentInput,
-    "assessmentType" | "startDate" | "endDate" | "userId"
-  >
+  input: {
+    male: Pollock3MaleSchema & { weight: number };
+    female: Pollock3FemaleSchema & { weight: number };
+  },
+  studentId: string
 ) => {
-  const { chest, abdomen, thigh, triceps, suprailiac, studentId } = input;
+  const { male, female } = input;
 
   let sumOfSkinfolds: number;
-  let bodyDensity: number;
+  let metrics: { bodyDensity: number; bodyFatPercentage: number };
+  let bmr: number;
+
+  const student = await studentRepository.findOne({ where: { id: studentId } });
+
+  if (!student) {
+    throw new AppError(401, "Student does not exists.");
+  }
+
+  const { age, gender } = student;
+
+  if (gender === GenderType.MALE) {
+    const requiredMaleProps = ["chest", "abdomen", "thigh"];
+
+    validateProperties(GenderType.MALE, male, requiredMaleProps);
+    sumOfSkinfolds = calculateSumOfSkinfolds(male, requiredMaleProps);
+    metrics = calculateBodyMetrics(sumOfSkinfolds, age, MALE_3_COEFFICIENTS);
+    bmr = calculateBMR(gender, input.male.weight, student.height, age);
+  } else {
+    const requiredFemaleProps = ["triceps", "suprailiac", "thigh"];
+
+    validateProperties(GenderType.FEMALE, female, requiredFemaleProps);
+    sumOfSkinfolds = calculateSumOfSkinfolds(female, requiredFemaleProps);
+    metrics = calculateBodyMetrics(sumOfSkinfolds, age, FEMALE_3_COEFFICIENTS);
+    bmr = calculateBMR(gender, input.female.weight, student.height, age);
+  }
+
+  return prepareResponse(
+    student,
+    metrics.bodyDensity,
+    metrics.bodyFatPercentage,
+    sumOfSkinfolds,
+    bmr
+  );
+};
+
+const pollock7 = async (
+  input: {
+    male: Pollock7MaleSchema & { weight: number };
+    female: Pollock7FemaleSchema & { weight: number };
+  },
+  studentId: string
+) => {
+  const { male, female } = input;
+
+  let sumOfSkinfolds: number;
+  let metrics: { bodyDensity: number; bodyFatPercentage: number };
+  let bmr: number;
 
   const student = await studentRepository.findOne({ where: { id: studentId } });
 
@@ -94,25 +142,131 @@ const pollock3 = async (
   const { age, gender } = student;
 
   if (gender === GenderType.MALE) {
-    sumOfSkinfolds = chest + abdomen + thigh;
-    const { a, b, c, d } = MALE_COEFFICIENTS;
-    bodyDensity =
-      a + b * sumOfSkinfolds + c * Math.pow(sumOfSkinfolds, 2) + d * age;
+    const requiredMaleProps = [
+      "chest",
+      "abdomen",
+      "thigh",
+      "subscapular",
+      "axilla",
+      "calf",
+      "triceps",
+    ];
+
+    validateProperties(GenderType.MALE, male, requiredMaleProps);
+    sumOfSkinfolds = calculateSumOfSkinfolds(male, requiredMaleProps);
+    metrics = calculateBodyMetrics(sumOfSkinfolds, age, MALE_7_COEFFICIENTS);
+    bmr = calculateBMR(gender, input.male.weight, student.height, age);
   } else {
-    sumOfSkinfolds = triceps + suprailiac + thigh;
-    const { a, b, c, d } = FEMALE_COEFFICIENTS;
+    const requiredFemaleProps = [
+      "triceps",
+      "suprailiac",
+      "thigh",
+      "subscapular",
+      "axilla",
+      "calf",
+      "abdomen",
+    ];
+
+    validateProperties(GenderType.FEMALE, female, requiredFemaleProps);
+    sumOfSkinfolds = calculateSumOfSkinfolds(female, requiredFemaleProps);
+    metrics = calculateBodyMetrics(sumOfSkinfolds, age, FEMALE_7_COEFFICIENTS);
+    bmr = calculateBMR(gender, input.female.weight, student.height, age);
+  }
+
+  return prepareResponse(
+    student,
+    metrics.bodyDensity,
+    metrics.bodyFatPercentage,
+    sumOfSkinfolds,
+    bmr
+  );
+};
+
+const validateProperties = (
+  gender: GenderType,
+  properties: any,
+  requiredProps: string[]
+) => {
+  const missingProps = requiredProps.filter(
+    (prop) => properties[prop] === undefined
+  );
+
+  if (missingProps.length > 0) {
+    throw new AppError(
+      400,
+      `Missing properties for gender ${gender}: ${missingProps.join(", ")}`
+    );
+  }
+};
+
+const calculateSumOfSkinfolds = (
+  properties: any,
+  requiredProps: string[]
+): number => {
+  return requiredProps.reduce((sum, prop) => sum + properties[prop], 0);
+};
+
+const calculateBodyMetrics = (
+  sumOfSkinfolds: number,
+  age: number,
+  coefficients: { a: number; b: number; c: number; d?: number }
+) => {
+  let bodyDensity;
+
+  if (coefficients.d !== undefined) {
     bodyDensity =
-      a + b * sumOfSkinfolds + c * Math.pow(sumOfSkinfolds, 2) + d * age;
+      coefficients.a -
+      coefficients.b * sumOfSkinfolds +
+      coefficients.c * Math.pow(sumOfSkinfolds, 2) -
+      coefficients.d * age;
+  } else {
+    bodyDensity =
+      coefficients.a - coefficients.b * sumOfSkinfolds + coefficients.c * age;
   }
 
   const bodyFatPercentage = (4.95 / bodyDensity - 4.5) * 100;
 
   return {
-    bodyDensity: bodyDensity.toFixed(2),
-    bodyFatPercentage: bodyFatPercentage.toFixed(2),
+    bodyDensity: Number(bodyDensity.toFixed(2)),
+    bodyFatPercentage: Number(bodyFatPercentage.toFixed(2)),
+  };
+};
+
+const prepareResponse = (
+  student: Student,
+  bodyDensity: number,
+  bodyFatPercentage: number,
+  sumOfSkinfolds: number,
+  bmr: number
+) => {
+  return {
+    bodyDensity,
+    bodyFatPercentage,
     sumOfSkinfolds,
     studentName: student.name,
+    bmr,
   };
+};
+
+const calculateFatMass = (weight: number, bodyFatPercentage: number) => {
+  return weight * (bodyFatPercentage / 100);
+};
+
+const calculateLeanMass = (weight: number, fatMass: number) => {
+  return weight - fatMass;
+};
+
+const calculateBMR = (
+  gender: GenderType,
+  weight: number,
+  height: number,
+  age: number
+) => {
+  if (gender === GenderType.MALE) {
+    return 66 + 13.7 * weight + 5 * height - 6.8 * age;
+  } else {
+    return 655 + 9.6 * weight + 1.8 * height - 4.7 * age;
+  }
 };
 
 export const getAssessmentsStudentByUserId = async (

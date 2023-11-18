@@ -1,6 +1,6 @@
 import { DeepPartial } from "typeorm";
 import { Student } from "database";
-import { differenceInYears, format, parse } from "date-fns";
+import { differenceInYears, parse } from "date-fns";
 
 import { AppDataSource } from "../../utils/data-source";
 
@@ -13,7 +13,6 @@ export const createStudent = async (input: DeepPartial<Student>) => {
     const age = differenceInYears(new Date(), parsedDate);
 
     input.age = age;
-    input.birthDate = format(parsedDate, "dd/MM/yyyy");
   }
 
   return studentRepository.save(studentRepository.create(input));

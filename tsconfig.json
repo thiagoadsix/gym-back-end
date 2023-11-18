@@ -9,7 +9,7 @@
     "forceConsistentCasingInFileNames": true,
     "allowJs": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
   },
   "include": [
     "src",

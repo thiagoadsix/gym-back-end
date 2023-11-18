@@ -7,6 +7,7 @@ import { User } from "./user";
 
 export enum AssessmentType {
   POLLOCK_3 = "POLLOCK_3",
+  POLLOCK_7 = "POLLOCK_7",
 }
 
 export enum AssessmentStatus {
@@ -52,11 +53,11 @@ export class Assessment extends Base {
   })
   status!: AssessmentStatus;
 
-  @Column("varchar", { name: "start_date", nullable: true })
-  startDate?: string;
+  @Column("date", { name: "start_date", nullable: true })
+  startDate?: Date;
 
-  @Column("varchar", { name: "end_date", nullable: true })
-  endDate?: string;
+  @Column("date", { name: "end_date", nullable: true })
+  endDate?: Date;
 
   @Column("varchar")
   name!: string;

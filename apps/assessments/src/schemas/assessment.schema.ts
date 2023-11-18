@@ -1,5 +1,5 @@
 import { AssessmentType } from "database";
-import { nativeEnum, number, object, string, TypeOf } from "zod";
+import { object, string, TypeOf, z } from "zod";
 
 const isValidDate = (dateString: string) => {
   const regex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
@@ -21,28 +21,68 @@ const isValidDate = (dateString: string) => {
     date.getDate() === day
   );
 };
+const pollock3MaleSchema = z.object({
+  chest: z.number(),
+  abdomen: z.number(),
+  thigh: z.number(),
+});
 
-export const createAssessmentSchema = object({
-  body: object({
-    userId: string({ required_error: "User ID is required" }).uuid(),
-    chest: number({ required_error: "Chest is required" }),
-    abdomen: number({ required_error: "Abdomen is required" }),
-    thigh: number({ required_error: "Thigh is required" }),
-    triceps: number({ required_error: "Tricep is required" }),
-    suprailiac: number({ required_error: "Suprailiac Date is required" }),
-    studentId: string({ required_error: "Student ID is required" }),
-    assessmentType: nativeEnum(AssessmentType, {
-      description: "Assessment Type is required",
-    }),
-    weight: number({ required_error: "Weight is required" }),
-    startDate: string().refine(isValidDate, {
-      message:
-        "Data inválida. O formato deve ser DD/MM/YYYY e representar uma data real.",
-    }),
-    endDate: string().refine(isValidDate, {
-      message:
-        "Data inválida. O formato deve ser DD/MM/YYYY e representar uma data real.",
-    }),
+const pollock3FemaleSchema = z.object({
+  triceps: z.number(),
+  suprailiac: z.number(),
+  thigh: z.number(),
+});
+
+const pollock7MaleSchema = z.object({
+  chest: z.number(),
+  abdomen: z.number(),
+  thigh: z.number(),
+  subscapular: z.number(),
+  axilla: z.number(),
+  calf: z.number(),
+  triceps: z.number(),
+});
+
+const pollock7FemaleSchema = z.object({
+  triceps: z.number(),
+  suprailiac: z.number(),
+  thigh: z.number(),
+  subscapular: z.number(),
+  axilla: z.number(),
+  calf: z.number(),
+  abdomen: z.number(),
+});
+
+const baseBodyParts = z.object({
+  weight: z.number({ required_error: "Weight is required." }),
+  triceps: z.number().default(0),
+  suprailiac: z.number().default(0),
+  thigh: z.number().default(0),
+  subscapular: z.number().default(0),
+  axilla: z.number().default(0),
+  calf: z.number().default(0),
+  chest: z.number().default(0),
+  abdomen: z.number().default(0),
+});
+
+export const createAssessmentSchema = z.object({
+  body: z.object({
+    userId: z.string().uuid(),
+    studentId: z.string(),
+    assessmentType: z.nativeEnum(AssessmentType),
+    startDate: z
+      .string()
+      .regex(
+        /^\d{4}-\d{2}-\d{2}$/,
+        "Invalid birth date format. Format must be YYYY-MM-DD"
+      ),
+    endDate: z
+      .string()
+      .regex(
+        /^\d{4}-\d{2}-\d{2}$/,
+        "Invalid birth date format. Format must be YYYY-MM-DD"
+      ),
+    data: baseBodyParts,
   }),
 });
 
@@ -57,6 +97,11 @@ export const getAssessmentsByUserIdSchema = object({
     userId: string({ required_error: "User ID is required" }),
   }),
 });
+
+export type Pollock3FemaleSchema = TypeOf<typeof pollock3FemaleSchema>;
+export type Pollock3MaleSchema = TypeOf<typeof pollock3MaleSchema>;
+export type Pollock7FemaleSchema = TypeOf<typeof pollock7FemaleSchema>;
+export type Pollock7MaleSchema = TypeOf<typeof pollock7MaleSchema>;
 
 export type CreateAssessmentInput = TypeOf<
   typeof createAssessmentSchema

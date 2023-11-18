@@ -27,8 +27,8 @@ export class Student extends Base {
   @Column("numeric", { precision: 5, scale: 2 })
   height!: number;
 
-  @Column()
-  birthDate!: string;
+  @Column("date")
+  birthDate!: Date;
 
   @Column()
   age!: number;
@@ -39,6 +39,12 @@ export class Student extends Base {
     enumName: "gender_type",
   })
   gender!: GenderType;
+
+  @Column({ nullable: true })
+  email?: string;
+
+  @Column({ nullable: true })
+  phone?: string;
 
   @ManyToOne(() => User, (user) => user.students)
   @JoinColumn({ name: "user_id" })

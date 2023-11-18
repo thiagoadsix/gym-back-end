@@ -55,8 +55,8 @@ export class AssessmentsView extends BaseEntity {
     assessmentId: string;
     assessmentType: AssessmentType;
     assessmentData: any;
-    startDate: string;
-    endDate: string;
+    startDate: Date;
+    endDate: Date;
     status: AssessmentStatus;
   }>;
 }
